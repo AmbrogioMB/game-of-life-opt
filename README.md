@@ -1,6 +1,7 @@
-# Optimising over the Game of Life — code and data
+# Maximum growth in the Game of Life on surfaces — code and data
 
-Companion code for *Optimising over the Game of Life* (Bernardelli). Given an
+Companion code for *Maximising the growth rate of Conway's Game of Life on
+closed surfaces: bounds, constructions and exact methods* (Bernardelli). Given an
 `n × n` board and a horizon `T`, which initial configuration maximises
 `|X(T)| / |X(0)|`? The board is one of six surfaces obtained by gluing the edges
 of the square.
