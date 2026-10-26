@@ -1,0 +1,6 @@
+dp n=10 T=1 top=s
+dp n=10 T=1 top=c
+dp n=11 T=1 top=s
+dp n=11 T=1 top=c
+dp n=12 T=1 top=s
+dp n=12 T=1 top=c

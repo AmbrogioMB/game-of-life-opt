@@ -1,0 +1,7 @@
+# Tested with Python 3.10.12 (Linux, where the results were produced) and
+# Python 3.14.7 (Windows). Lower bounds are the oldest versions tested.
+numpy>=1.26          # tested 1.26.2 and 2.5.3
+# optional: the integer program (milp, root, duel); needs a Gurobi licence
+gurobipy>=11.0       # tested 11.0.0 and 13.0.3
+# optional: the constraint program (cpsat, duel)
+ortools>=9.15        # tested 9.15.6755

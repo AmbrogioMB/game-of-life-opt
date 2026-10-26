@@ -1,0 +1,12 @@
+milp n=6 T=2 top=s form=bigm sym=1 cuts=1
+milp n=6 T=2 top=c form=bigm sym=1 cuts=1
+milp n=6 T=2 top=t form=bigm sym=1 cuts=1
+milp n=6 T=2 top=m form=bigm sym=1 cuts=1
+milp n=6 T=2 top=k form=bigm sym=1 cuts=1
+milp n=6 T=2 top=p form=bigm sym=1 cuts=1
+milp n=6 T=3 top=s form=bigm sym=1 cuts=1
+milp n=6 T=3 top=c form=bigm sym=1 cuts=1
+milp n=6 T=3 top=t form=bigm sym=1 cuts=1
+milp n=6 T=3 top=m form=bigm sym=1 cuts=1
+milp n=6 T=3 top=k form=bigm sym=1 cuts=1
+milp n=6 T=3 top=p form=bigm sym=1 cuts=1
