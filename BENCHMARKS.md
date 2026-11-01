@@ -1,7 +1,11 @@
 # Enumeration baseline: measured cost
 
-All figures from one core of the development desktop, task
+All figures from one core of a desktop (Intel Core i7-1185G7), task
 `brute n=6 T=1 top=s chunk=0/64` (~7.9e8 boards after filtering).
+These measurements describe `gol/brute.py`, the general NumPy enumerator.
+The `exact_m8.cpp` certificate uses a separate C++ bitplane kernel and
+visits only the 30,260,340 weight-eight seeds; these baseline timings do not
+describe that restricted search.
 
 | version | per task | speedup | whole n=6 job (1152 tasks) |
 | --- | --- | --- | --- |
