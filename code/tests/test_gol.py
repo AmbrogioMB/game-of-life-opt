@@ -122,6 +122,14 @@ def test_bounds():
              for n in range(4, 13) for cfg in tp.ALL)
     check('2x2 block stable on all six surfaces for n>=4', ok)
 
+    for cfg in tp.ALL:
+        x = bd.still_life(3, cfg)
+        check('n=3 %s has an all-horizon lower bound of 1' % tp.NAMES[cfg],
+              x is not None and x != 0
+              and all(y == x for y in sim.trajectory(
+                  x, sim.neighbour_lists(3, cfg), 3, 5))
+              and bd.lower_bound(3, cfg, 5) == 1.0)
+
     odd = all(abs(bd.stripe_bound(n, tp.MOBIUS)[0] - 3.0) < 1e-12
               for n in (3, 5, 7, 9, 11, 13))
     even = all(abs(bd.stripe_bound(n, tp.MOBIUS)[0] - (3 - 2 / n)) < 1e-12
@@ -179,9 +187,22 @@ def test_dp_vs_brute():
     for cfg in (tp.SQUARE, tp.CYLINDER):
         for n in (3, 4, 5):
             b = brute.search(n, 1, cfg)['rate']
-            d = dp.growth(n, cfg)['rate']
+            r = dp.growth(n, cfg)
+            d = r['rate']
             check('n=%d %s  brute=%.6f dp=%.6f' % (n, tp.NAMES[cfg], b, d),
                   abs(b - d) < 1e-9)
+            x = sim.decode(n, r['board'])
+            g = sim.growth(x, sim.neighbour_lists(n, cfg), n, 1)
+            check('n=%d %s  DP seed attains %d/%d'
+                  % (n, tp.NAMES[cfg], r['numerator'], r['denominator']),
+                  abs(g - d) < 1e-12)
+
+    limited = dp.growth(5, tp.SQUARE, max_iter=1)
+    complete = dp.growth(5, tp.SQUARE)
+    check('iteration-limited DP does not certify optimality',
+          limited['status'] == 'FEASIBLE'
+          and limited['rate'] <= complete['rate']
+          and complete['status'] == 'OPTIMAL')
 
 
 def test_milp_vs_brute():
@@ -203,6 +224,136 @@ def test_milp_vs_brute():
                           abs(b - r) < 1e-6)
 
 
+def test_chunk_coverage():
+    print('\n9. a partial chunked enumeration is not reported as an optimum')
+    import os
+    import tempfile
+    import run
+    from gol import io_utils as io
+    rows = [{'method': 'brute', 'n': 4, 'T': 1, 'topology': 's', 'rate': 1.5,
+             'status': 'OPTIMAL', 'chunk': c, 'chunks': 4} for c in range(3)]
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, 'r.csv')
+        f, w = io.open_writer(path)
+        for r in rows:
+            w.writerow(r)
+        f.close()
+        best, incomplete = run.certified_rates(path)
+        check('3 of 4 chunks: left out and flagged',
+              (4, 1, 's') not in best and incomplete == [((4, 1, 's'), 3, 4)])
+        f, w = io.open_writer(path)
+        w.writerow(dict(rows[0], chunk=3, rate=1.8))
+        f.close()
+        best, incomplete = run.certified_rates(path)
+        check('4 of 4 chunks: maximum over the chunks reported',
+              best.get((4, 1, 's')) == (1.8, 'brute') and not incomplete)
+
+
+def test_sweep_certificate():
+    print('\n10. a sweep is optimal only if every population is settled')
+    import argparse
+    import types
+    import run
+
+    def row(m, status, cells=None, bound=None):
+        return {'n': 4, 'T': 1, 'topology': 's', 'm': m, 'status': status,
+                'final_cells': cells, 'bound': bound,
+                'rate': cells / m if cells is not None else None,
+                'seconds': 0.0, 'nodes': 0}
+
+    # n = 4, T = 1: the winner m = 4 (9/4) is optimal, but m = 5 stopped at a
+    # bound of 14 cells, and 14/5 > 9/4 leaves it open
+    rows = [row(3, 'OPTIMAL', 4), row(4, 'OPTIMAL', 9),
+            row(5, 'FEASIBLE', 10, 14.0), row(6, 'INFEASIBLE'),
+            row(7, 'OPTIMAL', 14)]
+    status, upper, open_ = bd.certify_sweep(4, 1, rows)
+    check('optimal winner, unresolved competitor: FEASIBLE',
+          status == 'FEASIBLE' and open_ == [5] and float(upper) == 14 / 5)
+    closed = rows[:2] + [row(5, 'FEASIBLE', 10, 11.0)] + rows[3:]
+    status, _, open_ = bd.certify_sweep(4, 1, closed)
+    check('competitor bounded below the winner: OPTIMAL',
+          status == 'OPTIMAL' and not open_)
+    for bound in (float('inf'), float('-inf'), float('nan')):
+        status, upper, open_ = bd.certify_sweep(
+            4, 1, rows[:2] + [row(5, 'NO_SOLUTION', bound=bound)] + rows[3:])
+        check('non-finite bound %s leaves the population unresolved' % bound,
+              status == 'FEASIBLE' and open_ == [5] and upper >= 14 / 5)
+
+    # both summary branches of run.py, with the solvers mocked out
+    best = rows[1]
+    fake = types.SimpleNamespace(solve=lambda *a, **k: (dict(best), [dict(r) for r in rows]))
+    saved = {k: sys.modules.get(k) for k in ('gol.milp', 'gol.cpsat')}
+    import gol
+    saved_attr = {k: getattr(gol, k, None) for k in ('milp', 'cpsat')}
+    try:
+        for name in ('milp', 'cpsat'):
+            sys.modules['gol.' + name] = fake
+            setattr(gol, name, fake)
+        args = argparse.Namespace(threads=0, time_limit=0, no_cutoff=False)
+        for method in ('milp', 'cpsat'):
+            out = list(run.run_task({'method': method, 'n': '4', 'T': '1',
+                                     'top': 's'}, args))
+            summary = out[-1]
+            check('%s summary with an open population is FEASIBLE' % method,
+                  summary['method'] == method
+                  and summary['status'] == 'FEASIBLE'
+                  and abs(summary['bound'] - 14 / 5) < 1e-12)
+    finally:
+        for k, v in saved.items():
+            if v is None:
+                sys.modules.pop(k, None)
+            else:
+                sys.modules[k] = v
+        for k, v in saved_attr.items():
+            if v is None:
+                if hasattr(gol, k):
+                    delattr(gol, k)
+            else:
+                setattr(gol, k, v)
+
+
+def test_restart_and_merge():
+    print('\n11. interrupted sweeps and retried results')
+    import csv
+    import tempfile
+    from pathlib import Path
+    from gol import io_utils as io
+    with tempfile.TemporaryDirectory() as directory:
+        part = str(Path(directory) / 'part.csv')
+        merged = str(Path(directory) / 'merged.csv')
+        task = 'milp|n=4|T=1|top=s'
+        f, w = io.open_writer(part)
+        io.write(f, w, dict(method='milp-m', task=task, m=4,
+                             status='OPTIMAL', final_cells=7))
+        check('a population checkpoint is not a completed sweep',
+              task not in io.done_tasks(part))
+        io.write(f, w, dict(method='milp', task=task, m=4,
+                             status='FEASIBLE', rate=1.75))
+        check('an unresolved summary can be explicitly retried',
+              task in io.done_tasks(part)
+              and task not in io.done_tasks(part, retry_feasible=True))
+        io.write(f, w, dict(method='milp-m', task=task, m=4,
+                             status='OPTIMAL', final_cells=8))
+        io.write(f, w, dict(method='milp', task=task, m=4,
+                             status='OPTIMAL', rate=2.0))
+        f.close()
+        check('a certified summary is retained on restart',
+              task in io.done_tasks(part, retry_feasible=True))
+        io.merge([part], merged)
+        with open(merged, newline='') as source:
+            rows = list(csv.DictReader(source))
+        check('merge retains the latest population and summary',
+              len(rows) == 2 and rows[0]['final_cells'] == '8'
+              and rows[1]['status'] == 'OPTIMAL')
+        before = Path(merged).read_bytes()
+        try:
+            io.merge([str(Path(directory))], merged)
+        except OSError:
+            pass
+        check('a failed merge preserves the previous output',
+              Path(merged).read_bytes() == before)
+
+
 def main():
     test_topology()
     test_projective_degeneracy()
@@ -212,6 +363,9 @@ def main():
     test_symmetry()
     test_dp_vs_brute()
     test_milp_vs_brute()
+    test_chunk_coverage()
+    test_sweep_certificate()
+    test_restart_and_merge()
     print('\n%s' % ('ALL TESTS PASSED' if not FAIL
                     else '%d FAILURES: %s' % (len(FAIL), FAIL)))
     return 1 if FAIL else 0

@@ -99,6 +99,19 @@ def cmd_tasks(args):
 
 # ------------------------------------------------------------------ running
 
+def _certify(summary, n, T, rows):
+    """Set the status of a sweep summary from ALL its populations.
+
+    The winning subproblem's own status says nothing about the populations
+    that did not win; see bounds.certify_sweep.  'bound' becomes an upper
+    bound on G_T(n) itself.
+    """
+    status, upper, _ = bd.certify_sweep(n, T, rows)
+    summary['status'] = status
+    summary['bound'] = float(upper) if upper is not None else None
+    summary['gap'] = None
+
+
 def run_task(spec, args):
     """Yield result rows for one task."""
     method = spec['method']
@@ -154,6 +167,7 @@ def run_task(spec, args):
                                            'status': 'NO_SOLUTION'}
         summary['method'] = 'milp'
         summary['m'] = best['m'] if best else None
+        _certify(summary, n, T, rows)
         # the summary must carry the cost of the WHOLE m sweep, not of the one
         # subproblem that happened to be optimal
         summary['seconds'] = round(sum(r['seconds'] or 0 for r in rows), 3)
@@ -176,6 +190,7 @@ def run_task(spec, args):
             'status': 'NO_SOLUTION'}
         summary['method'] = 'cpsat'
         summary['m'] = best['m'] if best else None
+        _certify(summary, n, T, rows)
         summary['seconds'] = round(sum(r['seconds'] or 0 for r in rows), 3)
         summary['nodes'] = sum(r['nodes'] or 0 for r in rows)
         summary['task'] = tid
@@ -237,7 +252,7 @@ def cmd_worker(args):
     with open(args.tasks, encoding='utf-8') as f:
         tasks = [l.strip() for l in f if l.strip() and not l.startswith('#')]
     mine = [t for i, t in enumerate(tasks) if i % args.of == args.shard]
-    done = io.done_tasks(args.out)
+    done = io.done_tasks(args.out, getattr(args, 'retry_feasible', False))
     f, w = io.open_writer(args.out)
     print('shard %d/%d: %d of %d tasks, %d already done'
           % (args.shard, args.of, len(mine), len(tasks), len(done)), flush=True)
@@ -253,6 +268,9 @@ def cmd_worker(args):
         try:
             for row in run_task(spec, args):
                 io.write(f, w, row)
+            if spec['method'] == 'root':
+                io.write(f, w, {'method': 'task-complete', 'task': tid,
+                                'status': 'COMPLETED'})
             print('done  %s' % line, flush=True)
         except Exception:
             traceback.print_exc()
@@ -314,35 +332,68 @@ def cmd_check(args):
             print('  %2d/%-2d %10.1f %10.1f %10.2f %10.2f'
                   % (n, T, b['triple'], b['lightcone'], b['board'], b['best']))
 
-    print('\nlower bound: stable 2x2 block')
+    print('\nlower bound: verified nonempty still life')
     for n in range(3, 9):
         miss = [tp.LETTERS[c] for c in tp.ALL
-                if bd.block_lower_bound(n, c) is None]
+                if bd.still_life(n, c) is None]
         print('  n=%d  %s' % (n, 'all six' if not miss
                               else 'missing on ' + ','.join(miss)))
 
 
-def cmd_analyse(args):
-    """Evidence for the two asymptotic conjectures about the square."""
+def certified_rates(path):
+    """Best certified G_T(n) per (n, T, topology), and incomplete enumerations.
+
+    A chunked exhaustive search certifies an optimum only once every chunk of
+    its partition is present: the maximum over some of the chunks is merely a
+    lower bound.  Such enumerations are left out and returned separately as
+    (key, chunks present, chunks in the partition).
+    """
     import csv as _csv
-    g = {}
-    with open(args.csv, newline='', encoding='utf-8') as f:
+    best, parts = {}, {}
+    with open(path, newline='', encoding='utf-8') as f:
         for row in _csv.DictReader(f):
-            if row['method'] not in PROVEN_METHODS or row['topology'] != 's':
-                continue
-            if row.get('T') != '1' or not row.get('rate'):
+            if row['method'] not in PROVEN_METHODS or not row.get('rate'):
                 continue
             if row.get('status') not in ('OPTIMAL', None, ''):
                 continue
-            n = int(row['n'])
-            g[n] = max(g.get(n, 0.0), float(row['rate']))
+            key = (int(row['n']), int(row['T']), row['topology'])
+            r = float(row['rate'])
+            of = int(row.get('chunks') or 1)
+            if row['method'] == 'brute' and of > 1:
+                got = parts.setdefault((key, of), [set(), 0.0])
+                got[0].add(int(row['chunk']))
+                got[1] = max(got[1], r)
+                continue
+            if key not in best or r > best[key][0]:
+                best[key] = (r, row['method'])
+    incomplete = []
+    for (key, of), (got, r) in sorted(parts.items()):
+        if len(got) < of:
+            incomplete.append((key, len(got), of))
+        elif key not in best or r > best[key][0]:
+            best[key] = (r, 'brute')
+    return best, incomplete
+
+
+def _warn_incomplete(incomplete):
+    for (n, T, top), got, of in incomplete:
+        print('warning: brute n=%d T=%d top=%s has %d of %d chunks; '
+              'left out as uncertified' % (n, T, top, got, of), file=sys.stderr)
+
+
+def cmd_analyse(args):
+    """Evidence for the two asymptotic conjectures about the square."""
+    best, incomplete = certified_rates(args.csv)
+    _warn_incomplete(incomplete)
+    g = {n: r for (n, T, top), (r, _) in best.items() if T == 1 and top == 's'}
 
     print('rate of convergence of G_1^s(n) to 3')
     print('  %4s %12s %12s %12s' % ('n', 'G_1^s(n)', '3 - G', 'n(3 - G)'))
     for n in sorted(g):
         gap = 3.0 - g[n]
         print('  %4d %12.6f %12.6f %12.4f' % (n, g[n], gap, n * gap))
-    print('  a flat last column means the gap is Theta(1/n), ruling out O(1/n^2)')
+    print('  a flat last column is consistent with a gap of order 1/n;'
+          ' finitely many values prove nothing about the rate')
 
     print('\nis the block family optimal where it applies (n = 3k+2)?')
     print('  %4s %4s %12s %12s %8s' % ('k', 'n', 'family', 'optimum', 'equal'))
@@ -420,18 +471,8 @@ def cmd_merge(args):
 
 
 def cmd_table(args):
-    import csv as _csv
-    best = {}
-    with open(args.csv, newline='', encoding='utf-8') as f:
-        for row in _csv.DictReader(f):
-            if row['method'] not in PROVEN_METHODS or not row.get('rate'):
-                continue
-            if row.get('status') not in ('OPTIMAL', None, ''):
-                continue
-            key = (int(row['n']), int(row['T']), row['topology'])
-            r = float(row['rate'])
-            if key not in best or r > best[key][0]:
-                best[key] = (r, row['method'])
+    best, incomplete = certified_rates(args.csv)
+    _warn_incomplete(incomplete)
     ns = sorted({k[0] for k in best})
     Ts = sorted({k[1] for k in best})
     order = ['s', 'c', 't', 'm', 'k', 'p']
@@ -489,6 +530,8 @@ def main():
     p.add_argument('--threads', type=int, default=0)
     p.add_argument('--time-limit', type=float, default=0)
     p.add_argument('--no-cutoff', action='store_true')
+    p.add_argument('--retry-feasible', action='store_true',
+                   help='retry completed sweeps that did not prove optimality')
     p.set_defaults(fn=cmd_worker)
 
     p = sub.add_parser('solve');    common(p)

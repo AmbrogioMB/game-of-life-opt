@@ -28,8 +28,9 @@ Two ways of encoding one Game of Life step:
                  x' <= sigma_3 + x
 
              More binaries, no big-M constants.  Measured on small instances
-             its LP bound equals that of 'bigm' WITH the two cuts below, so it
-             is not tighter in practice -- see the remark in the paper.
+             its LP bound equals that of 'bigm' WITH the cuts on 179 of the
+             190 common subproblems and is marginally tighter on the other 11;
+             see the remark in the paper.
 """
 import time
 
@@ -131,46 +132,51 @@ def solve_fixed_m(n, T, cfg, m, formulation='bigm', symmetry=True,
     t0 = time.time()
     model, x, _ = _base_model(n, T, cfg, formulation, symmetry, corner_policy,
                               threads, time_limit, mipgap, log, cuts)
-    model.addConstr(gp.quicksum(x[i, j, 0]
-                                for i in range(n) for j in range(n)) == m)
-    final = gp.quicksum(x[i, j, T] for i in range(n) for j in range(n))
-    model.setObjective(final, GRB.MAXIMIZE)
-    model.addConstr(final <= bd.max_final_cells(n, T, m))
-    if cutoff_cells is not None:
-        model.addConstr(final >= cutoff_cells)
+    try:
+        model.addConstr(gp.quicksum(x[i, j, 0]
+                                    for i in range(n) for j in range(n)) == m)
+        final = gp.quicksum(x[i, j, T] for i in range(n) for j in range(n))
+        model.setObjective(final, GRB.MAXIMIZE)
+        model.addConstr(final <= bd.max_final_cells(n, T, m))
+        if cutoff_cells is not None:
+            model.addConstr(final >= cutoff_cells)
 
-    if relax:
-        model.update()          # relax() copies the model as last updated
-        model = model.relax()
-    model.optimize()
-    res = _blank(n, T, cfg, m,
-                 formulation + ('+lp' if relax else ''), symmetry, cuts)
-    res['seconds'] = round(time.time() - t0, 3)
-    res['nodes'] = int(getattr(model, 'NodeCount', 0))
+        if relax:
+            model.update()          # relax() copies the model as last updated
+            original = model
+            model = original.relax()
+            original.dispose()
+        model.optimize()
+        res = _blank(n, T, cfg, m,
+                     formulation + ('+lp' if relax else ''), symmetry, cuts)
+        res['seconds'] = round(time.time() - t0, 3)
+        res['nodes'] = int(getattr(model, 'NodeCount', 0))
 
-    if model.Status in (GRB.INFEASIBLE, GRB.INF_OR_UNBD):
-        res['status'] = 'INFEASIBLE'
+        if model.Status in (GRB.INFEASIBLE, GRB.INF_OR_UNBD):
+            res['status'] = 'INFEASIBLE'
+            return res
+        if model.SolCount == 0:
+            res['status'] = 'NO_SOLUTION'
+            res['bound'] = float(getattr(model, 'ObjBound', float('nan')))
+            return res
+
+        if relax:
+            res.update(status='OPTIMAL', final_cells=None,
+                       rate=float(model.ObjVal) / m, bound=float(model.ObjVal),
+                       gap=None)
+            return res
+
+        cells = int(round(model.ObjVal))
+        seed = sim.from_cells(n, [(i, j) for i in range(n) for j in range(n)
+                                  if round(x[i, j, 0].X) == 1])
+        res.update(status='OPTIMAL' if model.Status == GRB.OPTIMAL else 'FEASIBLE',
+                   final_cells=cells, rate=cells / m,
+                   bound=float(model.ObjBound),
+                   gap=float(getattr(model, 'MIPGap', 0.0)),
+                   board=sim.encode(n, seed))
         return res
-    if model.SolCount == 0:
-        res['status'] = 'NO_SOLUTION'
-        res['bound'] = float(getattr(model, 'ObjBound', float('nan')))
-        return res
-
-    if relax:
-        res.update(status='OPTIMAL', final_cells=None,
-                   rate=float(model.ObjVal) / m, bound=float(model.ObjVal),
-                   gap=None)
-        return res
-
-    cells = int(round(model.ObjVal))
-    seed = sim.from_cells(n, [(i, j) for i in range(n) for j in range(n)
-                              if round(x[i, j, 0].X) == 1])
-    res.update(status='OPTIMAL' if model.Status == GRB.OPTIMAL else 'FEASIBLE',
-               final_cells=cells, rate=cells / m,
-               bound=float(model.ObjBound),
-               gap=float(getattr(model, 'MIPGap', 0.0)),
-               board=sim.encode(n, seed))
-    return res
+    finally:
+        model.dispose()
 
 
 def solve(n, T, cfg, formulation='bigm', symmetry=True, corner_policy='simple',
@@ -222,42 +228,47 @@ def solve_ratio(n, T, cfg, formulation='bigm', symmetry=True,
     model, x, _ = _base_model(n, T, cfg, formulation, symmetry, corner_policy,
                               threads, time_limit, mipgap, log, cuts)
 
-    board = [(i, j) for i in range(n) for j in range(n)]
-    r = model.addVar(lb=lb, ub=ub, vtype=GRB.CONTINUOUS, name='r')
-    g = model.addVars(board, lb=0.0, ub=ub, vtype=GRB.CONTINUOUS, name='g')
+    try:
+        board = [(i, j) for i in range(n) for j in range(n)]
+        r = model.addVar(lb=lb, ub=ub, vtype=GRB.CONTINUOUS, name='r')
+        g = model.addVars(board, lb=0.0, ub=ub, vtype=GRB.CONTINUOUS, name='g')
 
-    # g_ij = r * x_ij0, McCormick over r in [lb, ub] and x in {0,1}
-    for (i, j) in board:
-        model.addConstr(g[i, j] >= lb * x[i, j, 0])
-        model.addConstr(g[i, j] >= ub * x[i, j, 0] + r - ub)
-        model.addConstr(g[i, j] <= lb * x[i, j, 0] + r - lb)
-        model.addConstr(g[i, j] <= ub * x[i, j, 0])
-    model.addConstr(gp.quicksum(g[i, j] for (i, j) in board)
-                    == gp.quicksum(x[i, j, T] for (i, j) in board))
-    model.addConstr(gp.quicksum(x[i, j, 0] for (i, j) in board) >= bd.MIN_SEED)
-    model.setObjective(r, GRB.MAXIMIZE)
+        # g_ij = r * x_ij0, McCormick over r in [lb, ub] and x in {0,1}
+        for (i, j) in board:
+            model.addConstr(g[i, j] >= lb * x[i, j, 0])
+            model.addConstr(g[i, j] >= ub * x[i, j, 0] + r - ub)
+            model.addConstr(g[i, j] <= lb * x[i, j, 0] + r - lb)
+            model.addConstr(g[i, j] <= ub * x[i, j, 0])
+        model.addConstr(gp.quicksum(g[i, j] for (i, j) in board)
+                        == gp.quicksum(x[i, j, T] for (i, j) in board))
+        model.addConstr(gp.quicksum(x[i, j, 0] for (i, j) in board) >= bd.MIN_SEED)
+        model.setObjective(r, GRB.MAXIMIZE)
 
-    if relax:
-        model.update()          # relax() copies the model as last updated
-        model = model.relax()
-    model.optimize()
+        if relax:
+            model.update()          # relax() copies the model as last updated
+            original = model
+            model = original.relax()
+            original.dispose()
+        model.optimize()
 
-    out = _blank(n, T, cfg, None, formulation + ('+lp' if relax else ''),
-                 symmetry, cuts)
-    out['seconds'] = round(time.time() - t0, 3)
-    out['nodes'] = int(getattr(model, 'NodeCount', 0))
-    out['lb_used'] = lb
-    out['ub_used'] = ub
-    if model.SolCount == 0 and model.Status != GRB.OPTIMAL:
-        out['status'] = 'NO_SOLUTION'
+        out = _blank(n, T, cfg, None, formulation + ('+lp' if relax else ''),
+                     symmetry, cuts)
+        out['seconds'] = round(time.time() - t0, 3)
+        out['nodes'] = int(getattr(model, 'NodeCount', 0))
+        out['lb_used'] = lb
+        out['ub_used'] = ub
+        if model.SolCount == 0 and model.Status != GRB.OPTIMAL:
+            out['status'] = 'NO_SOLUTION'
+            return out
+        out.update(status='OPTIMAL' if model.Status == GRB.OPTIMAL else 'FEASIBLE',
+                   rate=float(model.ObjVal),
+                   bound=float(getattr(model, 'ObjBound', model.ObjVal)),
+                   gap=float(getattr(model, 'MIPGap', 0.0)))
+        if not relax:
+            seed = sim.from_cells(n, [(i, j) for (i, j) in board
+                                      if round(x[i, j, 0].X) == 1])
+            out['board'] = sim.encode(n, seed)
+            out['final_cells'] = int(round(sum(x[i, j, T].X for (i, j) in board)))
         return out
-    out.update(status='OPTIMAL' if model.Status == GRB.OPTIMAL else 'FEASIBLE',
-               rate=float(model.ObjVal),
-               bound=float(getattr(model, 'ObjBound', model.ObjVal)),
-               gap=float(getattr(model, 'MIPGap', 0.0)))
-    if not relax:
-        seed = sim.from_cells(n, [(i, j) for (i, j) in board
-                                  if round(x[i, j, 0].X) == 1])
-        out['board'] = sim.encode(n, seed)
-        out['final_cells'] = int(round(sum(x[i, j, T].X for (i, j) in board)))
-    return out
+    finally:
+        model.dispose()

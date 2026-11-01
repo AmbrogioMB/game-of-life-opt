@@ -2,14 +2,13 @@
 
 Why a second solver
 -------------------
-The measured root gap of the integer program is enormous (median 44%, mean 82%
-over the benchmark of the paper), and neither a tighter transition encoding nor
-the obvious valid inequalities move it -- the weakness is not in how one step is
-written but in the fact that nothing in the relaxation couples the cells of a
-neighbourhood beyond their sum.  A method whose strength does not come from a
-linear relaxation is therefore the natural thing to try: CP-SAT proves
-optimality by clause learning rather than by bounding, so the useless relaxation
-costs it nothing.
+The LP bound of the integer program is weak: on the 190 subproblems of the
+paper's formulation comparison it exceeds the integer optimum by 46% at the
+median, 91% on average and 733% at worst, and neither the valid cuts nor the
+unary encoding of the neighbour count change that materially.  CP-SAT combines
+clause learning with propagation and its own linear relaxations, so it attacks
+the same model in a different way; the paper compares the two empirically
+rather than claiming a reason why either should win.
 
 The model is the same one, stated natively:
 

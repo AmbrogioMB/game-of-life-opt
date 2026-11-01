@@ -27,33 +27,52 @@ def write(f, w, row):
     f.flush()          # survive a wall-clock kill
 
 
-def done_tasks(path):
-    """Task ids already present in `path` with a usable result."""
+def done_tasks(path, retry_feasible=False):
+    """Tasks with a terminal summary or explicit completion marker.
+
+    Per-population rows are checkpoints, not completed sweeps. On a restart
+    an unfinished sweep is rerun; merge() retains its latest records.
+    """
     if not os.path.exists(path):
         return set()
-    out = set()
+    latest = {}
     with open(path, newline='', encoding='utf-8') as f:
         for row in csv.DictReader(f):
-            if row.get('task') and row.get('status') not in (None, '', 'ERROR'):
-                out.add(row['task'])
-    return out
+            task = row.get('task')
+            if not task:
+                continue
+            method, status = row.get('method'), row.get('status')
+            if method == task.split('|', 1)[0] or method == 'task-complete':
+                latest[task] = status
+    terminal = {'OPTIMAL', 'FEASIBLE', 'NO_SOLUTION', 'INFEASIBLE', 'COMPLETED'}
+    if retry_feasible:
+        terminal -= {'FEASIBLE', 'NO_SOLUTION'}
+    return {task for task, status in latest.items() if status in terminal}
 
 
 def merge(paths, out):
-    """Concatenate part files into one CSV, replacing `out` if it exists."""
-    if os.path.exists(out):
-        os.remove(out)
-    f, w = open_writer(out)
-    seen = set()
+    """Merge atomically, retaining the latest record when a task was retried."""
+    import tempfile
+    rows = {}
     for p in paths:
         if not os.path.exists(p):
             continue
         with open(p, newline='', encoding='utf-8') as g:
             for row in csv.DictReader(g):
                 key = (row.get('method'), row.get('task'), row.get('m'))
-                if key in seen:
-                    continue
-                seen.add(key)
-                w.writerow(row)
-    f.close()
-    return len(seen)
+                rows[key] = row
+    directory = os.path.dirname(os.path.abspath(out))
+    os.makedirs(directory, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix='.merge-', suffix='.csv', dir=directory)
+    try:
+        with os.fdopen(fd, 'w', newline='', encoding='utf-8') as f:
+            w = csv.DictWriter(f, fieldnames=FIELDS, extrasaction='ignore')
+            w.writeheader()
+            w.writerows(rows.values())
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temporary, out)
+    finally:
+        if os.path.exists(temporary):
+            os.remove(temporary)
+    return len(rows)

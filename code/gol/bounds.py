@@ -19,7 +19,8 @@ Lower bound
 -----------
 A 2x2 block is stable on every one of the six surfaces for every n >= 4 (and on
 the square, cylinder, torus and Klein bottle already for n = 3), so r >= 1.
-This is verified, not assumed -- see `block_lower_bound`.
+At n = 3 the Moebius band and projective plane have other four-cell still
+lifes. This is verified, not assumed -- see `still_life`.
 """
 from . import simulate as sim
 from . import topology as tp
@@ -49,6 +50,47 @@ def max_final_cells(n, T, m):
     return min(n * n, int(3 ** T * m), (2 * T + 1) ** 2 * m)
 
 
+def certify_sweep(n, T, rows):
+    """Status of a sweep over populations, from its per-m results.
+
+    The best rate found is G_T(n) only if every population m >= MIN_SEED is
+    settled: its cap max_final_cells/m does not exceed the best rate, it was
+    solved to optimality, it was proved infeasible under an improvement
+    cutoff, or the solver's bound on |X(T)| shows it cannot beat the best
+    rate.  Returns (status, upper, unresolved): status 'OPTIMAL' or
+    'FEASIBLE' ('NO_SOLUTION' if nothing was found), upper a valid upper bound
+    on G_T(n) as a Fraction, unresolved the populations left open.
+    """
+    from fractions import Fraction
+    import math
+    by_m = {int(r['m']): r for r in rows if r.get('m') is not None}
+    found = [r for r in rows
+             if r.get('final_cells') not in (None, '')
+             and r.get('status') in ('OPTIMAL', 'FEASIBLE')]
+    if not found:
+        return 'NO_SOLUTION', None, sorted(by_m)
+    best = max(Fraction(int(float(r['final_cells'])), int(r['m']))
+               for r in found)
+    upper, unresolved = best, []
+    for m in range(MIN_SEED, n * n + 1):
+        cap = Fraction(max_final_cells(n, T, m), m)
+        if cap <= best:
+            continue
+        r = by_m.get(m)
+        status = r.get('status') if r else None
+        if status in ('OPTIMAL', 'INFEASIBLE'):
+            continue
+        bound = r.get('bound') if r else None
+        if bound not in (None, ''):
+            b = float(bound)
+            if math.isfinite(b):
+                cap = min(cap, Fraction(int(b + 1e-6), m))
+        if cap > best:
+            unresolved.append(m)
+            upper = max(upper, cap)
+    return ('OPTIMAL' if not unresolved else 'FEASIBLE'), upper, unresolved
+
+
 def block_lower_bound(n, cfg, corner_policy='simple'):
     """Return a stable 2x2 block as a bitmask, or None if none exists."""
     cfg = tp.parse(cfg)
@@ -62,9 +104,24 @@ def block_lower_bound(n, cfg, corner_policy='simple'):
     return None
 
 
+def still_life(n, cfg, corner_policy='simple'):
+    """Return a verified nonempty still life, or None if none is known."""
+    cfg = tp.parse(cfg)
+    x = block_lower_bound(n, cfg, corner_policy)
+    if x is not None:
+        return x
+    if n == 3 and cfg in (tp.MOBIUS, tp.PROJECTIVE):
+        cells = ([(0, 0), (0, 1), (0, 2), (1, 0)] if cfg == tp.MOBIUS
+                 else [(0, 1), (1, 0), (1, 1), (1, 2)])
+        x = sim.from_cells(n, cells)
+        if sim.step(x, sim.neighbour_lists(n, cfg, corner_policy), n) == x:
+            return x
+    return None
+
+
 def lower_bound(n, cfg, T, corner_policy='simple'):
-    """A certified lower bound on G_T(n): 1.0 when a stable block exists."""
-    return 1.0 if block_lower_bound(n, cfg, corner_policy) is not None else 0.0
+    """A certified all-horizon lower bound, using a verified still life."""
+    return 1.0 if still_life(n, cfg, corner_policy) is not None else 0.0
 
 
 def stripe_bound(n, cfg, T=1, corner_policy='simple'):

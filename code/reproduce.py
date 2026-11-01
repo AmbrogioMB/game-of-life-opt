@@ -3,20 +3,19 @@
 The experiments were produced by sharding a task list across worker processes.
 `tasks/*.txt` in this repository are those lists verbatim -- they are the exact
 specification of what was run, down to every board size, horizon, surface and
-initial population. This replaces the shell orchestration with something
-portable.
+initial population. No shell scripts are needed.
 
-    python reproduce.py ../tasks/dp_big.txt --workers 4
+    python reproduce.py ../tasks/dp_small.txt --workers 1
     python reproduce.py ../tasks/duel.txt --workers 24
 
-Results go to ../rerun/<name>/part_<k>.csv and are merged into
-../rerun/<name>.csv, so the shipped data in ../data is never overwritten.
+Results go to ../reproduced/<name>/part_<k>.csv and are merged into
+../reproduced/<name>.csv, so the shipped data in ../data is never overwritten.
 Re-running skips tasks already recorded, so an interrupted
 run resumes by repeating the command.
 
 Note on worker counts: the exhaustive search streams large arrays and is
 limited by memory bandwidth rather than cores, so more than about 24 workers
-buys nothing and can cost. The solver tasks are compute-bound; give those
+may reduce throughput. The solver tasks are compute-bound; give those
 fewer workers with more threads each (--threads).
 """
 import argparse
@@ -37,14 +36,14 @@ def main():
     ap.add_argument('--time-limit', type=float, default=0,
                     help='seconds per solver subproblem; 0 = none')
     ap.add_argument('--out', default=None,
-                    help='output directory (default ../rerun/<task name>)')
+                    help='output directory (default ../reproduced/<task name>)')
     a = ap.parse_args()
 
     tasks = os.path.abspath(a.tasks)
     if not os.path.exists(tasks):
         sys.exit('no such task list: ' + tasks)
     name = os.path.splitext(os.path.basename(tasks))[0]
-    out = a.out or os.path.join(HERE, '..', 'rerun', name)
+    out = a.out or os.path.join(HERE, '..', 'reproduced', name)
     os.makedirs(out, exist_ok=True)
 
     n = sum(1 for l in open(tasks, encoding='utf-8')

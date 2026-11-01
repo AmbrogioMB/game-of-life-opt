@@ -1,13 +1,14 @@
-"""Exhaustive search -- the baseline a referee will propose.
+"""Exhaustive search for the optimal growth rate.
 
 Cost is O(T n^2 2^(n^2)).  It is the only method that covers all six surfaces
-for every T with no caveats, and it is the one the other two are validated
-against; it is also hopeless past n = 6, which is exactly the point the paper
-has to make quantitatively.
+for every T with no caveats, and the other three methods are validated against
+it. Its exponential cost limits the reported computations to n <= 6.
 
-The search enumerates seeds by population m, ascending, and stops as soon as
-n^2/m can no longer beat the incumbent -- valid because |X(T)| <= n^2.  That
-alone removes most of the space, since the optimum is around 2-3.
+Every board of the range is generated as a bitmask and its population m
+counted, but only boards with m >= MIN_SEED and n^2/m above the incumbent are
+simulated -- valid because |X(T)| <= n^2.  That filter removes most of the
+simulation work, since the optimum is around 2-3; `boards_scanned` counts the
+simulated boards.
 
 `chunk` / `chunks` split the enumeration for an array job on the cluster, by
 contiguous slices so that each board index is generated exactly once across the
