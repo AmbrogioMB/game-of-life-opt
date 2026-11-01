@@ -1,0 +1,4 @@
+milp n=6 T=3 top=c form=bigm sym=1 cuts=1
+milp n=6 T=3 top=t form=bigm sym=1 cuts=1
+milp n=6 T=3 top=m form=bigm sym=1 cuts=1
+milp n=6 T=3 top=k form=bigm sym=1 cuts=1
