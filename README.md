@@ -89,8 +89,8 @@ python reproduce.py ../tasks/brute_n6.txt    --workers 24
 python reproduce.py ../tasks/formulation.txt --workers 8 --threads 2
 ```
 
-The runner shards each list across local processes, writes `rerun/<name>/part_k.csv`,
-and merges to `rerun/<name>.csv`; the shipped results in `data/` are never
+The runner shards each list across local processes, writes `reproduced/<name>/part_k.csv`,
+and merges to `reproduced/<name>.csv`; the shipped results in `data/` are never
 touched. Re-running skips work already recorded, so an interrupted run resumes
 by repeating the command. A sweep interrupted before its terminal summary is
 rerun from the start. Use `run.py worker --retry-feasible` to retry completed
@@ -157,12 +157,12 @@ enumeration. It uses one thread and constant memory; no solver is needed.
 To reproduce the search and audit the released certificates (from `code/`):
 
 ```bash
-mkdir -p ../rerun
-g++ -O3 -std=c++17 exact_m8.cpp -o ../rerun/exact_m8
-python verify_certificates.py --executable ../rerun/exact_m8 --out ../rerun/certificates.json
+mkdir -p ../reproduced
+g++ -O3 -std=c++17 exact_m8.cpp -o ../reproduced/exact_m8
+python verify_certificates.py --executable ../reproduced/exact_m8 --out ../reproduced/certificates.json
 ```
 
-On Windows compile to `../rerun/exact_m8.exe` and pass that executable path.
+On Windows compile to `../reproduced/exact_m8.exe` and pass that executable path.
 The verifier reruns the full search and compares it with `data/exact_m8.json`,
 checks its simulator against the Python reference on 498 steps, checks both raw
 archives against the released CSVs, task lists and metadata, simulates every
@@ -176,13 +176,13 @@ input hashes. The combined certificate stays outside the MILP summary CSVs and
 To regenerate tables from the experiment CSVs:
 
 ```bash
-python run.py merge   --out ../rerun/all.csv ../rerun/*/part_*.csv
+python run.py merge   --out ../reproduced/all.csv ../reproduced/*/part_*.csv
 python run.py table   --csv ../data/all.csv     # LaTeX
 python run.py analyse --csv ../data/all.csv     # convergence, family optimality
 python run.py duel    --csv ../data/all.csv     # tab:cp-vs-ip and tab:cp-vs-ip-2
 ```
 
-The last three read the shipped results; point them at `../rerun/all.csv` to
+The last three read the shipped results; point them at `../reproduced/all.csv` to
 check a rerun against them. `tab:lower` comes from `overnight_structure.py`,
 whose output is shipped as `data/overnight_structure.log`, and the preliminary
 solver comparison from `bench_solvers.py`, shipped as `data/bench_solvers.csv`.
