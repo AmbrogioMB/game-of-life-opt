@@ -1,0 +1,14 @@
+{
+  "n": 6,
+  "T": 3,
+  "topology": "s",
+  "m": 8,
+  "status": "OPTIMAL",
+  "method": "exhaustive-fixed-m",
+  "boards_scanned": 30260340,
+  "final_cells": 22,
+  "seed": 32309376,
+  "seconds": 0.501604,
+  "python_step_comparisons": 498,
+  "source_sha256": "5de8c886b841c0fe9b2415c01f6e175ffb39d0bed913bbd521c34ade39542d90"
+}

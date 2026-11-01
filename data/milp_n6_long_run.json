@@ -1,0 +1,14 @@
+{
+  "status": "INCOMPLETE",
+  "pid": 1854030,
+  "identity": "250009104",
+  "started": "Sat Oct 31 12:57:17 2026",
+  "settings": {
+    "WORKERS": 2,
+    "THREADS": 2,
+    "TIMELIMIT": 14400,
+    "MAX_HOURS": 24,
+    "WORKER_MEMORY_MB": 3072
+  },
+  "finished": "Sat Oct 31 22:38:10 2026"
+}

@@ -1,0 +1,39 @@
+{
+  "status": "COMPLETED",
+  "pid": 1912481,
+  "identity": "254296689",
+  "started": "Sun Nov  1 00:51:52 2026",
+  "settings": {
+    "WORKERS": 1,
+    "THREADS": 1,
+    "TIMELIMIT": 3600,
+    "MAX_HOURS": 24,
+    "WORKER_MEMORY_MB": 3072
+  },
+  "stage": "verify returned results",
+  "updated": "Sun Nov  1 10:58:27 2026",
+  "progress": {
+    "brute_small": [
+      54,
+      54
+    ],
+    "milp_xval": [
+      52,
+      52
+    ],
+    "milp_n6": [
+      7,
+      7
+    ],
+    "dp_small": [
+      14,
+      14
+    ],
+    "dp_large": [
+      4,
+      4
+    ]
+  },
+  "finished": "Sun Nov  1 10:58:28 2026",
+  "elapsed_hours": 10.1099
+}

@@ -1,0 +1,15 @@
+method,topology,n,T,formulation,symmetry,cuts,m,rate,numerator,denominator,final_cells,bound,gap,status,seconds,nodes,iterations,boards_scanned,chunk,chunks,lb_used,ub_used,board,task
+dp,s,3,1,,,,,1.75,7,4,,,,OPTIMAL,0.001,,2,,,,,,AJo=,dp|n=3|T=1|top=s
+dp,c,3,1,,,,,3.0,9,3,,,,OPTIMAL,0.001,,2,,,,,,ADg=,dp|n=3|T=1|top=c
+dp,s,4,1,,,,,1.8,9,5,,,,OPTIMAL,0.002,,2,,,,,,ILI=,dp|n=4|T=1|top=s
+dp,c,4,1,,,,,3.0,12,4,,,,OPTIMAL,0.002,,2,,,,,,APA=,dp|n=4|T=1|top=c
+dp,s,5,1,,,,,2.1,21,10,,,,OPTIMAL,0.018,,3,,,,,,ACWDKw==,dp|n=5|T=1|top=s
+dp,c,5,1,,,,,3.0,15,5,,,,OPTIMAL,0.018,,3,,,,,,AAAD4A==,dp|n=5|T=1|top=c
+dp,s,6,1,,,,,2.2857142857142856,32,14,,,,OPTIMAL,0.128,,3,,,,,,BJtALZI=,dp|n=6|T=1|top=s
+dp,c,6,1,,,,,3.0,36,12,,,,OPTIMAL,0.085,,2,,,,,,AD8AD8A=,dp|n=6|T=1|top=c
+dp,s,7,1,,,,,2.2857142857142856,32,14,,,,OPTIMAL,1.22,,3,,,,,,AAATsgCbEg==,dp|n=7|T=1|top=s
+dp,c,7,1,,,,,3.0,42,14,,,,OPTIMAL,0.808,,2,,,,,,AAAH8AA/gA==,dp|n=7|T=1|top=c
+dp,s,8,1,,,,,2.4,60,25,,,,OPTIMAL,12.394,,3,,,,,,ElsAyVsAyVs=,dp|n=8|T=1|top=s
+dp,c,8,1,,,,,3.0,48,16,,,,OPTIMAL,12.393,,3,,,,,,AAAA/wAA/wA=,dp|n=8|T=1|top=c
+dp,s,9,1,,,,,2.5,75,30,,,,OPTIMAL,130.789,,3,,,,,,AJJtoAJbZBBDdoI=,dp|n=9|T=1|top=s
+dp,c,9,1,,,,,3.0,81,27,,,,OPTIMAL,86.844,,2,,,,,,AAD/gAAf8AAD/gA=,dp|n=9|T=1|top=c

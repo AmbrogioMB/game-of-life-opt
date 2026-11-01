@@ -1,0 +1,5 @@
+method,topology,n,T,formulation,symmetry,cuts,m,rate,numerator,denominator,final_cells,bound,gap,status,seconds,nodes,iterations,boards_scanned,chunk,chunks,lb_used,ub_used,board,task
+dp,s,10,1,,,,,2.5,75,30,,,,OPTIMAL,1244.561,,3,,,,,,AAASdsgASbYggQbsgg==,dp|n=10|T=1|top=s
+dp,c,10,1,,,,,3.0,90,30,,,,OPTIMAL,827.743,,2,,,,,,AAAA/8AAA/8AAA/8AA==,dp|n=10|T=1|top=c
+dp,s,11,1,,,,,2.5454545454545454,112,44,,,,OPTIMAL,14527.747,,3,,,,,,ADaUmADbUkwAbakmADbSSA==,dp|n=11|T=1|top=s
+dp,c,11,1,,,,,3.0,99,33,,,,OPTIMAL,14676.143,,3,,,,,,AAAAAAD/4AAAf/AAAD/4AA==,dp|n=11|T=1|top=c

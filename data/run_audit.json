@@ -1,0 +1,543 @@
+{
+  "status": "VERIFIED",
+  "checked": [
+    {
+      "task": "brute|n=3|T=1|top=c|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=3|T=1|top=k|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=3|T=1|top=m|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=3|T=1|top=p|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=3|T=1|top=s|chunk=0/1",
+      "rate": "7/4"
+    },
+    {
+      "task": "brute|n=3|T=1|top=t|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=3|T=2|top=c|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=3|T=2|top=k|chunk=0/1",
+      "rate": "1"
+    },
+    {
+      "task": "brute|n=3|T=2|top=m|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=3|T=2|top=p|chunk=0/1",
+      "rate": "7/4"
+    },
+    {
+      "task": "brute|n=3|T=2|top=s|chunk=0/1",
+      "rate": "7/4"
+    },
+    {
+      "task": "brute|n=3|T=2|top=t|chunk=0/1",
+      "rate": "1"
+    },
+    {
+      "task": "brute|n=3|T=3|top=c|chunk=0/1",
+      "rate": "2"
+    },
+    {
+      "task": "brute|n=3|T=3|top=k|chunk=0/1",
+      "rate": "1"
+    },
+    {
+      "task": "brute|n=3|T=3|top=m|chunk=0/1",
+      "rate": "9/5"
+    },
+    {
+      "task": "brute|n=3|T=3|top=p|chunk=0/1",
+      "rate": "1"
+    },
+    {
+      "task": "brute|n=3|T=3|top=s|chunk=0/1",
+      "rate": "4/3"
+    },
+    {
+      "task": "brute|n=3|T=3|top=t|chunk=0/1",
+      "rate": "1"
+    },
+    {
+      "task": "brute|n=4|T=1|top=c|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=4|T=1|top=k|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=4|T=1|top=m|chunk=0/1",
+      "rate": "5/2"
+    },
+    {
+      "task": "brute|n=4|T=1|top=p|chunk=0/1",
+      "rate": "13/5"
+    },
+    {
+      "task": "brute|n=4|T=1|top=s|chunk=0/1",
+      "rate": "9/5"
+    },
+    {
+      "task": "brute|n=4|T=1|top=t|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=4|T=2|top=c|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=4|T=2|top=k|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=4|T=2|top=m|chunk=0/1",
+      "rate": "5/2"
+    },
+    {
+      "task": "brute|n=4|T=2|top=p|chunk=0/1",
+      "rate": "11/4"
+    },
+    {
+      "task": "brute|n=4|T=2|top=s|chunk=0/1",
+      "rate": "7/4"
+    },
+    {
+      "task": "brute|n=4|T=2|top=t|chunk=0/1",
+      "rate": "5/2"
+    },
+    {
+      "task": "brute|n=4|T=3|top=c|chunk=0/1",
+      "rate": "4"
+    },
+    {
+      "task": "brute|n=4|T=3|top=k|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=4|T=3|top=m|chunk=0/1",
+      "rate": "4"
+    },
+    {
+      "task": "brute|n=4|T=3|top=p|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=4|T=3|top=s|chunk=0/1",
+      "rate": "9/5"
+    },
+    {
+      "task": "brute|n=4|T=3|top=t|chunk=0/1",
+      "rate": "5/2"
+    },
+    {
+      "task": "brute|n=5|T=1|top=c|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=5|T=1|top=k|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=5|T=1|top=m|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=5|T=1|top=p|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=5|T=1|top=s|chunk=0/1",
+      "rate": "21/10"
+    },
+    {
+      "task": "brute|n=5|T=1|top=t|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=5|T=2|top=c|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=5|T=2|top=k|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=5|T=2|top=m|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=5|T=2|top=p|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=5|T=2|top=s|chunk=0/1",
+      "rate": "13/7"
+    },
+    {
+      "task": "brute|n=5|T=2|top=t|chunk=0/1",
+      "rate": "3"
+    },
+    {
+      "task": "brute|n=5|T=3|top=c|chunk=0/1",
+      "rate": "5"
+    },
+    {
+      "task": "brute|n=5|T=3|top=k|chunk=0/1",
+      "rate": "4"
+    },
+    {
+      "task": "brute|n=5|T=3|top=m|chunk=0/1",
+      "rate": "4"
+    },
+    {
+      "task": "brute|n=5|T=3|top=p|chunk=0/1",
+      "rate": "4"
+    },
+    {
+      "task": "brute|n=5|T=3|top=s|chunk=0/1",
+      "rate": "12/5"
+    },
+    {
+      "task": "brute|n=5|T=3|top=t|chunk=0/1",
+      "rate": "4"
+    },
+    {
+      "task": "milp|n=3|T=1|top=c|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=3|T=1|top=k|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=3|T=1|top=m|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=3|T=1|top=p|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=3|T=1|top=s|form=bigm|sym=1|cuts=1",
+      "rate": "7/4"
+    },
+    {
+      "task": "milp|n=3|T=1|top=t|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=3|T=2|top=c|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=3|T=2|top=k|form=bigm|sym=1|cuts=1",
+      "rate": "1"
+    },
+    {
+      "task": "milp|n=3|T=2|top=m|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=3|T=2|top=p|form=bigm|sym=1|cuts=1",
+      "rate": "7/4"
+    },
+    {
+      "task": "milp|n=3|T=2|top=s|form=bigm|sym=1|cuts=1",
+      "rate": "7/4"
+    },
+    {
+      "task": "milp|n=3|T=2|top=t|form=bigm|sym=1|cuts=1",
+      "rate": "1"
+    },
+    {
+      "task": "milp|n=3|T=3|top=c|form=bigm|sym=1|cuts=1",
+      "rate": "2"
+    },
+    {
+      "task": "milp|n=3|T=3|top=k|form=bigm|sym=1|cuts=1",
+      "rate": "1"
+    },
+    {
+      "task": "milp|n=3|T=3|top=m|form=bigm|sym=1|cuts=1",
+      "rate": "9/5"
+    },
+    {
+      "task": "milp|n=3|T=3|top=p|form=bigm|sym=1|cuts=1",
+      "rate": "1"
+    },
+    {
+      "task": "milp|n=3|T=3|top=s|form=bigm|sym=1|cuts=1",
+      "rate": "4/3"
+    },
+    {
+      "task": "milp|n=3|T=3|top=t|form=bigm|sym=1|cuts=1",
+      "rate": "1"
+    },
+    {
+      "task": "milp|n=4|T=1|top=c|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=4|T=1|top=k|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=4|T=1|top=m|form=bigm|sym=1|cuts=1",
+      "rate": "5/2"
+    },
+    {
+      "task": "milp|n=4|T=1|top=p|form=bigm|sym=1|cuts=1",
+      "rate": "13/5"
+    },
+    {
+      "task": "milp|n=4|T=1|top=s|form=bigm|sym=1|cuts=1",
+      "rate": "9/5"
+    },
+    {
+      "task": "milp|n=4|T=1|top=t|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=4|T=2|top=c|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=4|T=2|top=k|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=4|T=2|top=m|form=bigm|sym=1|cuts=1",
+      "rate": "5/2"
+    },
+    {
+      "task": "milp|n=4|T=2|top=p|form=bigm|sym=1|cuts=1",
+      "rate": "11/4"
+    },
+    {
+      "task": "milp|n=4|T=2|top=s|form=bigm|sym=1|cuts=1",
+      "rate": "7/4"
+    },
+    {
+      "task": "milp|n=4|T=2|top=t|form=bigm|sym=1|cuts=1",
+      "rate": "5/2"
+    },
+    {
+      "task": "milp|n=4|T=3|top=c|form=bigm|sym=1|cuts=1",
+      "rate": "4"
+    },
+    {
+      "task": "milp|n=4|T=3|top=k|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=4|T=3|top=m|form=bigm|sym=1|cuts=1",
+      "rate": "4"
+    },
+    {
+      "task": "milp|n=4|T=3|top=p|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=4|T=3|top=s|form=bigm|sym=1|cuts=1",
+      "rate": "9/5"
+    },
+    {
+      "task": "milp|n=4|T=3|top=t|form=bigm|sym=1|cuts=1",
+      "rate": "5/2"
+    },
+    {
+      "task": "milp|n=5|T=1|top=k|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=5|T=1|top=m|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=5|T=1|top=p|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=5|T=1|top=t|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=5|T=2|top=c|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=5|T=2|top=k|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=5|T=2|top=m|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=5|T=2|top=p|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=5|T=2|top=s|form=bigm|sym=1|cuts=1",
+      "rate": "13/7"
+    },
+    {
+      "task": "milp|n=5|T=2|top=t|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=5|T=3|top=c|form=bigm|sym=1|cuts=1",
+      "rate": "5"
+    },
+    {
+      "task": "milp|n=5|T=3|top=k|form=bigm|sym=1|cuts=1",
+      "rate": "4"
+    },
+    {
+      "task": "milp|n=5|T=3|top=m|form=bigm|sym=1|cuts=1",
+      "rate": "4"
+    },
+    {
+      "task": "milp|n=5|T=3|top=p|form=bigm|sym=1|cuts=1",
+      "rate": "4"
+    },
+    {
+      "task": "milp|n=5|T=3|top=s|form=bigm|sym=1|cuts=1",
+      "rate": "12/5"
+    },
+    {
+      "task": "milp|n=5|T=3|top=t|form=bigm|sym=1|cuts=1",
+      "rate": "4"
+    },
+    {
+      "task": "milp|n=6|T=1|top=c|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=6|T=1|top=k|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=6|T=1|top=m|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=6|T=1|top=p|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=6|T=1|top=s|form=bigm|sym=1|cuts=1",
+      "rate": "16/7"
+    },
+    {
+      "task": "milp|n=6|T=1|top=t|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "milp|n=6|T=2|top=c|form=bigm|sym=1|cuts=1",
+      "rate": "3"
+    },
+    {
+      "task": "dp|n=3|T=1|top=c",
+      "rate": "3"
+    },
+    {
+      "task": "dp|n=3|T=1|top=s",
+      "rate": "7/4"
+    },
+    {
+      "task": "dp|n=4|T=1|top=c",
+      "rate": "3"
+    },
+    {
+      "task": "dp|n=4|T=1|top=s",
+      "rate": "9/5"
+    },
+    {
+      "task": "dp|n=5|T=1|top=c",
+      "rate": "3"
+    },
+    {
+      "task": "dp|n=5|T=1|top=s",
+      "rate": "21/10"
+    },
+    {
+      "task": "dp|n=6|T=1|top=c",
+      "rate": "3"
+    },
+    {
+      "task": "dp|n=6|T=1|top=s",
+      "rate": "16/7"
+    },
+    {
+      "task": "dp|n=7|T=1|top=c",
+      "rate": "3"
+    },
+    {
+      "task": "dp|n=7|T=1|top=s",
+      "rate": "16/7"
+    },
+    {
+      "task": "dp|n=8|T=1|top=c",
+      "rate": "3"
+    },
+    {
+      "task": "dp|n=8|T=1|top=s",
+      "rate": "12/5"
+    },
+    {
+      "task": "dp|n=9|T=1|top=c",
+      "rate": "3"
+    },
+    {
+      "task": "dp|n=9|T=1|top=s",
+      "rate": "5/2"
+    },
+    {
+      "task": "dp|n=10|T=1|top=c",
+      "rate": "3"
+    },
+    {
+      "task": "dp|n=10|T=1|top=s",
+      "rate": "5/2"
+    },
+    {
+      "task": "dp|n=11|T=1|top=c",
+      "rate": "3"
+    },
+    {
+      "task": "dp|n=11|T=1|top=s",
+      "rate": "28/11"
+    }
+  ],
+  "missing": [],
+  "unresolved": [],
+  "combined_square_n6_T3": {
+    "status": "OPTIMAL",
+    "rate": "20/7"
+  },
+  "hashes": {
+    "results/brute_small.csv": "bdd3e091502f6b111bf0d5e15b894d028d56ab123578396d56e2586da65ecac4",
+    "results/milp_xval.csv": "aa052508f547c5b7ad538b31cc71e112b7d8ed12cd939e63502d03e805b13870",
+    "results/milp_n6.csv": "cd54c50660699c8cb4beef2c18f01fe710558e99d278123f179e2e7e11f9647a",
+    "results/dp_small.csv": "7f407b3759301b1d27e8581dd6f4206875947affbbd4a1dbb369a492aeef8798",
+    "results/dp_large.csv": "56510222a3aa1129bfed7fe9d303bb504db9e5a50d35e1d8696895b24dae13d1",
+    "reference/workstation_milp.csv": "d8edaca477c948d50faab13df346720634e8d2034911c7ca44d9028fd96b9025"
+  }
+}
