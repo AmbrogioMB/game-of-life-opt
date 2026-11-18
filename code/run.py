@@ -112,8 +112,24 @@ def _certify(summary, n, T, rows):
     summary['gap'] = None
 
 
-def run_task(spec, args):
-    """Yield result rows for one task."""
+def _emitter(emit, method, tid):
+    """Callback for a sweep: label a population row and hand it to `emit`."""
+    if emit is None:
+        return None
+
+    def on_result(r):
+        emit(dict(r, method=method, task=tid))
+    return on_result
+
+
+def run_task(spec, args, emit=None):
+    """Yield result rows for one task.
+
+    A sweep over populations (milp, cpsat) returns only when it ends.  With
+    `emit`, each population row is passed to it as soon as it is solved and
+    is not yielded again, so a sweep stopped by a wall clock or a solver
+    error leaves its finished populations on record.
+    """
     method = spec['method']
     n = int(spec['n'])
     T = int(spec['T'])
@@ -157,11 +173,13 @@ def run_task(spec, args):
         best, rows = milp.solve(n, T, top, formulation=form, symmetry=symm,
                                 threads=args.threads,
                                 time_limit=args.time_limit,
-                                use_cutoff=not args.no_cutoff, cuts=cuts)
+                                use_cutoff=not args.no_cutoff, cuts=cuts,
+                                on_result=_emitter(emit, 'milp-m', tid))
         for r in rows:
             r['method'] = 'milp-m'
             r['task'] = tid
-            yield r
+            if emit is None:
+                yield r
         summary = dict(best) if best else {'n': n, 'T': T,
                                            'topology': tp.LETTERS[tp.parse(top)],
                                            'status': 'NO_SOLUTION'}
@@ -180,11 +198,13 @@ def run_task(spec, args):
         symm = bool(int(spec.get('sym', 1)))
         best, rows = cpsat.solve(n, T, top, symmetry=symm,
                                  threads=args.threads,
-                                 time_limit=args.time_limit)
+                                 time_limit=args.time_limit,
+                                 on_result=_emitter(emit, 'cpsat-m', tid))
         for r in rows:
             r['method'] = 'cpsat-m'
             r['task'] = tid
-            yield r
+            if emit is None:
+                yield r
         summary = dict(best) if best else {
             'n': n, 'T': T, 'topology': tp.LETTERS[tp.parse(top)],
             'status': 'NO_SOLUTION'}
@@ -266,7 +286,8 @@ def cmd_worker(args):
             continue
         print('start %s' % line, flush=True)
         try:
-            for row in run_task(spec, args):
+            for row in run_task(spec, args,
+                                emit=lambda row: io.write(f, w, row)):
                 io.write(f, w, row)
             if spec['method'] == 'root':
                 io.write(f, w, {'method': 'task-complete', 'task': tid,

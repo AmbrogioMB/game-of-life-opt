@@ -92,8 +92,9 @@ python reproduce.py ../tasks/formulation.txt --workers 8 --threads 2
 The runner shards each list across local processes, writes `reproduced/<name>/part_k.csv`,
 and merges to `reproduced/<name>.csv`; the shipped results in `data/` are never
 touched. Re-running skips work already recorded, so an interrupted run resumes
-by repeating the command. A sweep interrupted before its terminal summary is
-rerun from the start. Use `run.py worker --retry-feasible` to retry completed
+by repeating the command. Each population of a sweep is written as soon as it
+is solved, so an interrupted sweep keeps its finished populations on record;
+without its terminal summary it is still rerun from the start. Use `run.py worker --retry-feasible` to retry completed
 but unresolved sweeps. Merging retains the latest record for a retried task.
 
 **Time limits.** `--time-limit` caps each solver subproblem; `0`, the default,

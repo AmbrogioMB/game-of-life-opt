@@ -298,6 +298,24 @@ def test_sweep_certificate():
                   summary['method'] == method
                   and summary['status'] == 'FEASIBLE'
                   and abs(summary['bound'] - 14 / 5) < 1e-12)
+
+        # with `emit`, population rows are handed over as they are solved and
+        # only the summary is yielded
+        def streaming(*a, on_result=None, **k):
+            out = [dict(r) for r in rows]
+            for r in out:
+                on_result(r)
+            return dict(best), out
+        fake.solve = streaming
+        for method in ('milp', 'cpsat'):
+            seen = []
+            out = list(run.run_task({'method': method, 'n': '4', 'T': '1',
+                                     'top': 's'}, args, emit=seen.append))
+            check('%s sweep streams its populations before the summary' % method,
+                  [r['m'] for r in seen] == [r['m'] for r in rows]
+                  and all(r['method'] == method + '-m' and r['task'] for r in seen)
+                  and len(out) == 1 and out[0]['method'] == method
+                  and out[0]['status'] == 'FEASIBLE')
     finally:
         for k, v in saved.items():
             if v is None:
