@@ -1,8 +1,11 @@
 {
   "status": "CERTIFIED",
   "enumeration_values": 72,
-  "second_method_values": 71,
+  "second_method_values": 72,
+  "second_method_values_in_all_csv": 71,
   "combined_proof_values": 1,
+  "cluster_sweeps_checked": 7,
+  "cluster_witnesses_checked": 57,
   "batch_tasks": 131,
   "batch_witnesses_checked": 278,
   "long_sweep_tasks": 7,
@@ -29,7 +32,7 @@
       "boards_scanned": 30260340,
       "final_cells": 22,
       "seed": 32309376,
-      "seconds": 1.06314
+      "seconds": 1.53481
     }
   },
   "sha256": {
@@ -65,11 +68,14 @@
     "data/milp_n6_long_run.json": "2c66dd1f1c2c0541fd36e0b98ab5e4d062645ace46be1731d4c996b5af032af9",
     "data/raw/batch.zip": "89410c18f15cdf2ab21b0a52c155b81523f4a7846dea8fed54cf9285e7b5e119",
     "data/raw/milp_n6_long.zip": "27a26d8de52e98e658cff263205d91f6391750b43990b7ab3c1f0d44b0901a71",
+    "data/eos_milp_n6_t3_square.csv": "e543b97ccf58bdf5cf6837a662b9f800ad8c57b80608f772b58b9e9d03d642bd",
+    "data/eos_milp_n8_t1.csv": "bf0b1c55708ff9f3153f01b75f99971cedcce5cc72c8c1eef07cf2350bc6dd5e",
+    "data/eos_environment.json": "1e9ee0546baaf5dd94f42dcf91bb130da7e1f3e00d65d084ae19ffb05060c638",
     "code/exact_m8.cpp": "5de8c886b841c0fe9b2415c01f6e175ffb39d0bed913bbd521c34ade39542d90",
-    "code/verify_certificates.py": "63a0a1d6d05442013b8be65ad0e2d3b4ebf921d8fffc6a56c45137b7ebb17bba",
-    "code/run.py": "e9bd8f7f0b1110b86b2bbbda0bdc909895e263200e28eeb2430b290201bc945b",
+    "code/verify_certificates.py": "8d91361ba0bdb5fbecd065cca09096547fce8b877684f57f719e582f8b9a2e4c",
+    "code/run.py": "dffd5651c2c69e8703048e0a201527b4222bf9278e24f4443074671f7f816ffd",
     "code/reproduce.py": "9f6b48415ae1e3a28bc22ff310b0a9b0a01311e02152791f4c1a7f1fdd08891e",
-    "code/tests/test_gol.py": "7102ad8a25f4bef5c42bc3fd771d796252d6dc4b37e45d42adf1642b89a8d03f",
+    "code/tests/test_gol.py": "c475fc0a4cececb3e76e5354fb1ee840120205ae5c282e37e10a84d2316eebd7",
     "code/gol/simulate.py": "adcc47b1f572fd8025dfc0d8628d44b6d85b4a1948dbe4cd8b0ccafb716b659d",
     "code/gol/topology.py": "5f9241ec26b345509905bab8d43685242e09b292e6f3dbf8cb076bf0fbf80dc1",
     "code/gol/bounds.py": "52439321ad4b33df985a52f780b84aa829dfc3518c6324181c180c6c8274e357",

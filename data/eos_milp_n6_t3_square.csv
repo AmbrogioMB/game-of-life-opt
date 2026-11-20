@@ -1,0 +1,12 @@
+method,topology,n,T,formulation,symmetry,cuts,m,rate,numerator,denominator,final_cells,bound,gap,status,seconds,nodes,iterations,boards_scanned,chunk,chunks,lb_used,ub_used,board,task
+milp-m,s,6,3,bigm,1,1,3,1.3333333333333333,,,4,4.0,0.0,OPTIMAL,1.532,1067,,,,,,,AAAAAwQ=,milp|n=6|T=3|top=s|form=bigm|sym=1|cuts=1
+milp-m,s,6,3,bigm,1,1,4,1.75,,,7,7.0,0.0,OPTIMAL,5.748,3391,,,,,,,AAAgYQA=,milp|n=6|T=3|top=s|form=bigm|sym=1|cuts=1
+milp-m,s,6,3,bigm,1,1,5,2.4,,,12,12.0,0.0,OPTIMAL,27.08,22128,,,,,,,AAQBYQA=,milp|n=6|T=3|top=s|form=bigm|sym=1|cuts=1
+milp-m,s,6,3,bigm,1,1,6,2.6666666666666665,,,16,16.0,0.0,OPTIMAL,3430.595,1134576,,,,,,,AAAD8AA=,milp|n=6|T=3|top=s|form=bigm|sym=1|cuts=1
+milp-m,s,6,3,bigm,1,1,7,2.857142857142857,,,20,20.0,0.0,OPTIMAL,10407.64,1846931,,,,,,,AABPYAA=,milp|n=6|T=3|top=s|form=bigm|sym=1|cuts=1
+milp-m,s,6,3,bigm,1,1,8,,,,,,,INFEASIBLE,13148.072,3987864,,,,,,,,milp|n=6|T=3|top=s|form=bigm|sym=1|cuts=1
+milp-m,s,6,3,bigm,1,1,9,,,,,,,INFEASIBLE,30127.643,5810799,,,,,,,,milp|n=6|T=3|top=s|form=bigm|sym=1|cuts=1
+milp-m,s,6,3,bigm,1,1,10,,,,,,,INFEASIBLE,2756.915,536625,,,,,,,,milp|n=6|T=3|top=s|form=bigm|sym=1|cuts=1
+milp-m,s,6,3,bigm,1,1,11,,,,,,,INFEASIBLE,34.441,10977,,,,,,,,milp|n=6|T=3|top=s|form=bigm|sym=1|cuts=1
+milp-m,s,6,3,bigm,1,1,12,,,,,,,INFEASIBLE,0.347,1,,,,,,,,milp|n=6|T=3|top=s|form=bigm|sym=1|cuts=1
+milp,s,6,3,bigm,1,1,7,2.857142857142857,,,20,2.857142857142857,,OPTIMAL,59940.013,13354359,,,,,,,AABPYAA=,milp|n=6|T=3|top=s|form=bigm|sym=1|cuts=1

@@ -7,11 +7,13 @@ finite boards and surfaces: bounds, constructions and exact methods* (Bernardell
 of the square.
 
 Every reported optimum has a completed exact computation. All 72 small-board
-values have enumeration certificates; 71 also have a certificate from a second
-method. The remaining value (square, n=6, T=3) has a combined MILP and
-fixed-population exhaustive certificate, described below.
-The one-step optima on the square for `8 ≤ n ≤ 11` come from the dynamic
-program alone.
+values have enumeration certificates, and each also has a certificate from a
+second method. For the last of them (square, n=6, T=3) the second certificate
+is a MILP sweep run without a time limit; the time-limited sweep of the same
+task, closed by a fixed-population exhaustive search, is kept as a further
+check and is described below.
+The one-step optima on the square for `9 ≤ n ≤ 11` come from the dynamic
+program alone; at `n = 8` a MILP sweep gives the same value.
 
 ```
 code/     the library, the command line, the validation suite
@@ -110,6 +112,7 @@ versions and concurrent load.
 | `duel.csv`: 402 tasks | none |
 | `duel.csv`: the other 174 tasks (all with `n ≥ 6`) | 300 s |
 | `cpsat_table.csv` | 300 s |
+| `eos_milp_n6_t3_square.csv`, `eos_milp_n8_t1.csv` | none |
 
 An unresolved sweep is recorded as `FEASIBLE` or `NO_SOLUTION` and does not
 enter a table of optima. A solver can also certify an optimum before reaching
@@ -127,7 +130,9 @@ subproblems or certified full sweeps; missing populations are not treated as sol
 | `tab:results` (optima, `n ≤ 6`) | `brute_small.txt`, `brute_n6.txt` |
 | second certificate for `tab:results`, `n ≤ 5` | `milp_xval.txt`; `dp_small.txt` for square/cylinder at n=5, T=1 |
 | second certificate for `tab:results`, `n = 6` | `milp_n6.txt`, `milp_n6_long.txt`, `milp_n6_t3.txt`; `cpsat_table.txt` at `T = 3` |
+| second certificate, square `n = 6, T = 3` | the square task of `milp_n6_long.txt`, run without a time limit (`data/eos_milp_n6_t3_square.csv`) |
 | combined certificate, square `n = 6, T = 3` | `milp_n6_long.txt` + `code/exact_m8.cpp`, checked by `code/verify_certificates.py` |
+| MILP certificates at `n = 8, T = 1`, all six surfaces | the six `n=8 T=1` tasks of `milp_n78.txt`, run without a time limit (`data/eos_milp_n8_t1.csv`) |
 | `tab:convergence` (square, to `n = 11`) | `dp_small.txt`, `dp_large.txt` |
 | `tab:lower` (bounds, `n = 12…17`) | `code/overnight_structure.py` |
 | `tab:formulation` (big-M vs unary) | `formulation.txt` |
@@ -155,6 +160,17 @@ after three steps is 22, less than the 23 required to beat the MILP witness
 global optimum 20/7. This C++ enumerator is separate from the NumPy
 enumeration. It uses one thread and constant memory; no solver is needed.
 
+Two later sets of MILP sweeps were run without a time limit on a cluster and
+are shipped as separate files, with `data/eos_environment.json` recording the
+node, processor, software versions, threads and wall time of each task.
+`data/eos_milp_n6_t3_square.csv` is the square `n = 6, T = 3` sweep: it proves
+every population, including `m = 8` (no seed reaches 23 cells) and `m = 9`
+(none reaches 26), so its summary is `OPTIMAL` with rate 20/7.
+`data/eos_milp_n8_t1.csv` holds the six `n = 8, T = 1` sweeps, all `OPTIMAL`;
+on the square and the cylinder they agree with the dynamic program. Neither
+file enters `all.csv`, where the time-limited sweeps of the same tasks keep
+their recorded status.
+
 To reproduce the search and audit the released certificates (from `code/`):
 
 ```bash
@@ -167,8 +183,9 @@ On Windows compile to `../reproduced/exact_m8.exe` and pass that executable path
 The verifier reruns the full search and compares it with `data/exact_m8.json`,
 checks its simulator against the Python reference on 498 steps, checks both raw
 archives against the released CSVs, task lists and metadata, simulates every
-returned seed, recomputes every MILP sweep certificate, and checks agreement and
-coverage of all 72 enumeration results with the 71 second-method certificates
+returned seed, recomputes every MILP sweep certificate, including the cluster
+sweeps, and checks agreement and coverage of all 72 enumeration results with
+the 72 second-method certificates (71 in `all.csv`, one in the cluster sweep)
 and the combined proof. The C++ program also checks 60,000 transitions against
 its own scalar reference. The shipped report is `data/certificates.json`, with
 input hashes. The combined certificate stays outside the MILP summary CSVs and
@@ -230,7 +247,7 @@ does not cover the space, and the merged answer is silently wrong.
 `data/all.csv` merges the experiment CSVs listed in `code/verify_certificates.py`
 (`SOURCES`); no two of them share a `(method, task, m)` key.
 `bench_solvers.csv` is a separate preliminary benchmark, and the JSON combined
-certificate is also separate. Columns: `method`, topology (`s c t m k p`),
+certificate and the two `eos_*.csv` files are also separate. Columns: `method`, topology (`s c t m k p`),
 `n`, `T`, `m` (initial population), `rate`, `final_cells`, `status`, `seconds`,
 `board` (base64 seed), and solver-specific fields.
 
@@ -259,7 +276,8 @@ Three things to know when using the timings:
   formulation table uses the 190 subproblems that all three formulations solved.
   The unary formulation ignores the `cuts` flag, so its `cuts=0` and `cuts=1`
   rows describe the same model.
-- **Machines and software.** Every certificate and timing in the paper comes
+- **Machines and software.** Apart from the cluster sweeps named at the end
+  of this item, every certificate and timing in the paper comes
   from a Linux workstation (Intel Xeon w9-3495X, 56 cores / 112 threads,
   128 GB), in three configurations:
   (a) `brute_small`, `milp_xval`, `milp_n6`, `dp_small`, `dp_large` and
@@ -270,6 +288,10 @@ Three things to know when using the timings:
   two threads each, 3 GiB per process;
   (c) all other CSVs: Python 3.10.12, numpy 1.26.2, Gurobi 11.0.0 and OR-Tools
   9.15.6755, one thread per subproblem unless the task says otherwise.
+  The two `eos_*.csv` files are the exception: they come from the EOS cluster
+  of the University of Pavia (Intel Xeon Gold 6130 nodes), with Python 3.11.18,
+  numpy 2.2.6 and Gurobi 14.0.0, two threads for the `n = 6` sweep and four
+  for the `n = 8` sweeps (`data/eos_environment.json`).
   In configuration (a) the square n=6 DP took 0.128 s against 12.278 s for the
   MILP sweep, about 96 times as long; the square DP took 1244.561 s at n=10 and
   14527.747 s at n=11. These are single runs, not repeated timing trials. The

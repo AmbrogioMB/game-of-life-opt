@@ -1,0 +1,139 @@
+{
+  "cluster": "EOS, University of Pavia (Slurm 22.05, partition low-wn)",
+  "note": "sweeps without a solver time limit; MemLimit 6 GB (n=6) and 12 GB (n=8)",
+  "tasks": [
+    {
+      "task": "milp n=6 T=3 top=s form=bigm sym=1 cuts=1",
+      "host": "wn06",
+      "cpu": "Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz",
+      "versions": {
+        "python": "3.11.18",
+        "numpy": "2.2.6",
+        "gurobipy": "14.0.0",
+        "ortools": "9.15.6755",
+        "g++": "g++ (GCC) 8.5.0 20210514 (Red Hat 8.5.0-16)"
+      },
+      "threads": 2,
+      "time_limit": 0.0,
+      "slurm_job": "774110",
+      "slurm_array_task": "1",
+      "slurm_cpus": "2",
+      "start": "2026-11-17 16:52:51",
+      "wall_seconds": 59941.896
+    },
+    {
+      "task": "milp n=8 T=1 top=s form=bigm sym=1 cuts=1",
+      "host": "wn04",
+      "cpu": "Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz",
+      "versions": {
+        "python": "3.11.18",
+        "numpy": "2.2.6",
+        "gurobipy": "14.0.0",
+        "ortools": "9.15.6755",
+        "g++": "g++ (GCC) 8.5.0 20210514 (Red Hat 8.5.0-16)"
+      },
+      "threads": 4,
+      "time_limit": 0.0,
+      "slurm_job": "772370",
+      "slurm_array_task": "19",
+      "slurm_cpus": "4",
+      "start": "2026-11-18 18:18:08",
+      "wall_seconds": 1465.897
+    },
+    {
+      "task": "milp n=8 T=1 top=c form=bigm sym=1 cuts=1",
+      "host": "wn04",
+      "cpu": "Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz",
+      "versions": {
+        "python": "3.11.18",
+        "numpy": "2.2.6",
+        "gurobipy": "14.0.0",
+        "ortools": "9.15.6755",
+        "g++": "g++ (GCC) 8.5.0 20210514 (Red Hat 8.5.0-16)"
+      },
+      "threads": 4,
+      "time_limit": 0.0,
+      "slurm_job": "772370",
+      "slurm_array_task": "20",
+      "slurm_cpus": "4",
+      "start": "2026-11-18 18:42:35",
+      "wall_seconds": 6.452
+    },
+    {
+      "task": "milp n=8 T=1 top=t form=bigm sym=1 cuts=1",
+      "host": "wn04",
+      "cpu": "Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz",
+      "versions": {
+        "python": "3.11.18",
+        "numpy": "2.2.6",
+        "gurobipy": "14.0.0",
+        "ortools": "9.15.6755",
+        "g++": "g++ (GCC) 8.5.0 20210514 (Red Hat 8.5.0-16)"
+      },
+      "threads": 4,
+      "time_limit": 0.0,
+      "slurm_job": "772370",
+      "slurm_array_task": "21",
+      "slurm_cpus": "4",
+      "start": "2026-11-18 18:42:43",
+      "wall_seconds": 10.005
+    },
+    {
+      "task": "milp n=8 T=1 top=m form=bigm sym=1 cuts=1",
+      "host": "wn04",
+      "cpu": "Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz",
+      "versions": {
+        "python": "3.11.18",
+        "numpy": "2.2.6",
+        "gurobipy": "14.0.0",
+        "ortools": "9.15.6755",
+        "g++": "g++ (GCC) 8.5.0 20210514 (Red Hat 8.5.0-16)"
+      },
+      "threads": 4,
+      "time_limit": 0.0,
+      "slurm_job": "772370",
+      "slurm_array_task": "22",
+      "slurm_cpus": "4",
+      "start": "2026-11-18 18:42:54",
+      "wall_seconds": 25.362
+    },
+    {
+      "task": "milp n=8 T=1 top=k form=bigm sym=1 cuts=1",
+      "host": "wn04",
+      "cpu": "Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz",
+      "versions": {
+        "python": "3.11.18",
+        "numpy": "2.2.6",
+        "gurobipy": "14.0.0",
+        "ortools": "9.15.6755",
+        "g++": "g++ (GCC) 8.5.0 20210514 (Red Hat 8.5.0-16)"
+      },
+      "threads": 4,
+      "time_limit": 0.0,
+      "slurm_job": "772370",
+      "slurm_array_task": "23",
+      "slurm_cpus": "4",
+      "start": "2026-11-18 18:43:20",
+      "wall_seconds": 5.211
+    },
+    {
+      "task": "milp n=8 T=1 top=p form=bigm sym=1 cuts=1",
+      "host": "wn04",
+      "cpu": "Intel(R) Xeon(R) Gold 6130 CPU @ 2.10GHz",
+      "versions": {
+        "python": "3.11.18",
+        "numpy": "2.2.6",
+        "gurobipy": "14.0.0",
+        "ortools": "9.15.6755",
+        "g++": "g++ (GCC) 8.5.0 20210514 (Red Hat 8.5.0-16)"
+      },
+      "threads": 4,
+      "time_limit": 0.0,
+      "slurm_job": "772370",
+      "slurm_array_task": "24",
+      "slurm_cpus": "4",
+      "start": "2026-11-18 18:43:27",
+      "wall_seconds": 233.882
+    }
+  ]
+}

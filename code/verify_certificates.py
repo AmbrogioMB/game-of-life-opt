@@ -1,8 +1,10 @@
 """Audit the released small-board certificates and rerun the m=8 search.
 
 Compile exact_m8.cpp, then pass its executable with --executable. The solver
-status of the square n=6, T=3 sweep is FEASIBLE; the combined certificate that
-closes it is written to a separate JSON report.
+status of the time-limited square n=6, T=3 sweep in data/all.csv is FEASIBLE;
+the combined certificate that closes it is written to a separate JSON report.
+A later sweep of the same task without a time limit, in
+data/eos_milp_n6_t3_square.csv, settles every population and is rechecked too.
 """
 import argparse
 import csv
@@ -194,7 +196,51 @@ def audit_long(exact_row):
     return len(summaries), witnesses, combined
 
 
-def audit_table(combined):
+def audit_cluster():
+    """Recheck the later sweeps run without a time limit on a cluster.
+
+    eos_milp_n6_t3_square.csv is the square n=6, T=3 sweep, which settles
+    every population; eos_milp_n8_t1.csv holds the six n=8, T=1 sweeps. They
+    are kept out of data/all.csv, whose time-limited sweep of the same task
+    keeps its status. Returns the certified square rate and the counts.
+    """
+    witnesses = sweeps = 0
+    rates = {}
+    for name, wanted in (('eos_milp_n6_t3_square.csv', {(6, 3, 's')}),
+                         ('eos_milp_n8_t1.csv', {(8, 1, s) for s in 'sctmkp'})):
+        rows = read(name)
+        summaries = [r for r in rows if r['method'] == 'milp']
+        require({key(r) for r in summaries} == wanted and len(summaries) == len(wanted),
+                'cluster sweep coverage mismatch: '+name)
+        require(all(r['method'] in ('milp', 'milp-m') for r in rows),
+                'unexpected rows: '+name)
+        for row in rows:
+            if row.get('board'):
+                witness(row)
+                witnesses += 1
+        for row in summaries:
+            populations = [r for r in rows
+                           if r['task'] == row['task'] and r['method'] == 'milp-m']
+            status, upper, unresolved = bounds.certify_sweep(
+                int(row['n']), int(row['T']), populations)
+            require(status == row['status'] == 'OPTIMAL' and not unresolved
+                    and row.get('board'), 'cluster sweep not certified: '+row['task'])
+            require(math.isclose(float(upper), float(row['bound']), abs_tol=1e-12)
+                    and math.isclose(float(upper), float(row['rate']), abs_tol=1e-12),
+                    'cluster sweep bound mismatch: '+row['task'])
+            rates[key(row)] = upper
+            sweeps += 1
+    require(rates[(6, 3, 's')] == Fraction(20, 7), 'unexpected square n=6, T=3 optimum')
+    # the dynamic program gives the same one-step optima at n = 8
+    for row in read('dp_small.csv'):
+        if key(row) in rates:
+            require(row['status'] == 'OPTIMAL'
+                    and Fraction(int(row['numerator']), int(row['denominator'])) == rates[key(row)],
+                    'cluster sweep disagrees with the dynamic program')
+    return rates[(6, 3, 's')], sweeps, witnesses
+
+
+def audit_table(combined, square_rate):
     """Coverage and agreement of all 72 small-board values in data/all.csv."""
     all_rows = read('all.csv')
     merged = {}
@@ -245,6 +291,9 @@ def audit_table(combined):
         require(math.isclose(rate, brute[k], abs_tol=1e-12), 'methods disagree')
     require(math.isclose(brute[(6, 3, 's')], float(Fraction(combined['rate'])), abs_tol=1e-12),
             'combined proof disagrees with enumeration')
+    # the last value has its second-method certificate in the cluster sweep
+    require(math.isclose(brute[(6, 3, 's')], float(square_rate), abs_tol=1e-12),
+            'cluster sweep disagrees with enumeration')
     return witnesses, sweeps
 
 
@@ -274,19 +323,25 @@ def audit(executable):
 
     batch_tasks, batch_witnesses = audit_batch(exact)
     long_tasks, long_witnesses, combined = audit_long(exact_row)
-    all_witnesses, milp_sweeps = audit_table(combined)
+    square_rate, cluster_sweeps, cluster_witnesses = audit_cluster()
+    all_witnesses, milp_sweeps = audit_table(combined, square_rate)
 
     files = ['data/'+s+'.csv' for s in SOURCES] + ['tasks/'+s+'.txt' for s in SOURCES]
     files += ['data/'+n for n in ('all.csv', 'exact_m8.json', 'environment.json', 'run.json',
                                   'run_audit.json', 'milp_n6_long_run.json',
-                                  'raw/batch.zip', 'raw/milp_n6_long.zip')]
+                                  'raw/batch.zip', 'raw/milp_n6_long.zip',
+                                  'eos_milp_n6_t3_square.csv', 'eos_milp_n8_t1.csv',
+                                  'eos_environment.json')]
     files += ['code/'+n for n in ('exact_m8.cpp', 'verify_certificates.py',
                                   'run.py', 'reproduce.py', 'tests/test_gol.py',
                                   'gol/simulate.py', 'gol/topology.py', 'gol/bounds.py',
                                   'gol/dp.py', 'gol/brute.py', 'gol/milp.py',
                                   'gol/cpsat.py', 'gol/symmetry.py', 'gol/io_utils.py')]
     return dict(status='CERTIFIED', enumeration_values=72,
-                second_method_values=71, combined_proof_values=1,
+                second_method_values=72, second_method_values_in_all_csv=71,
+                combined_proof_values=1,
+                cluster_sweeps_checked=cluster_sweeps,
+                cluster_witnesses_checked=cluster_witnesses,
                 batch_tasks=batch_tasks, batch_witnesses_checked=batch_witnesses,
                 long_sweep_tasks=long_tasks, long_sweep_witnesses_checked=long_witnesses,
                 all_witnesses_checked=all_witnesses, milp_sweeps_checked=milp_sweeps,
@@ -303,7 +358,10 @@ def main():
     report = audit(args.executable.resolve())
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, indent=2)+'\n')
-    print('PASS: 72 enumeration certificates; 71 second-method certificates; 1 combined proof.')
+    print('PASS: 72 enumeration certificates; 72 second-method certificates '
+          '(71 in all.csv, 1 in the cluster sweep); 1 combined proof.')
+    print('PASS: %d cluster sweeps without a time limit (%d witnesses).'
+          % (report['cluster_sweeps_checked'], report['cluster_witnesses_checked']))
     print('PASS: %d batch tasks (%d witnesses); %d long n=6 sweeps (%d witnesses).'
           % (report['batch_tasks'], report['batch_witnesses_checked'],
              report['long_sweep_tasks'], report['long_sweep_witnesses_checked']))

@@ -4,6 +4,6 @@
 # (g++ 13.4.0 tested).
 numpy>=1.26          # tested 1.26.2, 2.2.6 and 2.5.3
 # optional: the integer program (milp, root, duel); needs a Gurobi licence
-gurobipy>=11.0       # tested 11.0.0 and 13.0.3
+gurobipy>=11.0       # tested 11.0.0, 13.0.3 and 14.0.0 (14 needs Python >= 3.11)
 # optional: the constraint program (cpsat, duel)
 ortools>=9.15        # tested 9.15.6755
